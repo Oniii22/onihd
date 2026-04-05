@@ -1,0 +1,133 @@
+{
+  "theme": "light",
+  "archetype": "4 (Swiss & High-Contrast)",
+  "design_philosophy": "Mobile-first utility with maximum clarity. The map is the primary canvas. The UI floats above it with clean lines, high-contrast typography, and purposeful motion. Color is stripped back, used exclusively to highlight actionable elements or the cheapest fuel prices (function-first).",
+  "typography": {
+    "fonts": {
+      "heading": "Work Sans",
+      "body": "Inter",
+      "mono": "JetBrains Mono"
+    },
+    "hierarchy": {
+      "h1": "text-3xl sm:text-4xl font-bold tracking-tight",
+      "h2": "text-2xl sm:text-3xl font-semibold tracking-tight",
+      "h3": "text-lg sm:text-xl font-medium",
+      "h4": "text-base font-semibold",
+      "body": "text-sm sm:text-base leading-relaxed text-gray-800",
+      "small_label": "text-xs font-bold uppercase tracking-[0.15em] text-gray-500",
+      "price_display": "text-2xl font-bold tracking-tighter"
+    },
+    "rules": [
+      "No generic sans for headings.",
+      "Tight letter spacing on headings.",
+      "Labels must be uppercase and widely tracked."
+    ]
+  },
+  "colors": {
+    "background": {
+      "primary": "#FFFFFF",
+      "secondary": "#F9FAFB",
+      "glass": "bg-white/80 backdrop-blur-xl"
+    },
+    "text": {
+      "primary": "#111827",
+      "secondary": "#4B5563",
+      "tertiary": "#9CA3AF",
+      "inverse": "#FFFFFF"
+    },
+    "accents": {
+      "brand": "#000000",
+      "cheapest": "#10B981",
+      "expensive": "#EF4444",
+      "focus": "#2563EB"
+    },
+    "rules": [
+      "95% of UI must be monochrome (White, Grey, Black).",
+      "Color is used STRICTLY for function (e.g., Green = Cheapest fuel).",
+      "Never use pure #000000, tint it slightly if needed, but for Swiss it can be stark.",
+      "Glassmorphism must have a 1px white/20 border."
+    ]
+  },
+  "spacing_and_layout": {
+    "padding_scale": {
+      "container": "p-4 sm:p-6",
+      "card": "p-4 sm:p-5",
+      "button": "px-6 py-3"
+    },
+    "border_radius": {
+      "small": "rounded-md",
+      "standard": "rounded-xl",
+      "pill": "rounded-full"
+    },
+    "rules": [
+      "Mobile-first: default layouts must be optimized for thumb reach.",
+      "The map should be full-bleed (`h-screen`, `w-screen`).",
+      "Floating UI elements should have generous outer margins (e.g., `m-4`) to not feel cramped against device edges.",
+      "List view should be dense enough to show 4-5 stations per screen, but breathable."
+    ]
+  },
+  "components": {
+    "search_bar": {
+      "description": "Floating pill at the top of the map for City Autocomplete.",
+      "style": "Crystal Glass style (bg-white/90 backdrop-blur-xl shadow-lg border border-black/5 rounded-full). Includes an icon and clear text input.",
+      "behavior": "Expands downward into a dropdown for autocomplete suggestions."
+    },
+    "filters": {
+      "description": "Fuel Type dropdown and Sort toggle.",
+      "style": "Neumorphic/Crisp pills situated right below or next to the search bar. High contrast active states (Black bg, white text).",
+      "options": ["Benzina", "Diesel", "GPL", "Metano"]
+    },
+    "map_markers": {
+      "description": "Custom Leaflet DivIcons showing the price directly on the map.",
+      "style_normal": "White pill, black text, subtle shadow.",
+      "style_cheapest": "Vibrant Green pill (#10B981), white text, pulsing ring animation (using absolute positioned element with ping animation).",
+      "clustering": "Standard cluster style, dark monochrome."
+    },
+    "station_card": {
+      "description": "Appears when a marker is tapped, or as items in the List View.",
+      "style": "Flat background, 1px subtle border (border-border), no massive shadow. Clean geometric layout.",
+      "content_layout": "Header: Station Brand Logo/Name + Distance. Body: Big Price Display + Address. Footer: 'Naviga' (Google Maps link) CTA.",
+      "cta_style": "Black button with white text, full width in details, with a navigation icon."
+    },
+    "view_toggle": {
+      "description": "Floating Action Button at bottom center to switch Map/Lista.",
+      "style": "Pill shaped, solid black background, white text, heavy shadow. Icon + Text (Mappa / Lista)."
+    }
+  },
+  "motion_and_interactions": {
+    "list_transition": {
+      "library": "framer-motion",
+      "effect": "Slide up from bottom (y: '100%' to y: 0) for the List View, while Map stays in background.",
+      "duration": "0.3s ease-out"
+    },
+    "hover_states": {
+      "buttons": "Slight scale-down (scale: 0.98) on tap/click. Black buttons turn dark gray.",
+      "cards": "Subtle border darkening."
+    },
+    "map_interactions": {
+      "fly_to": "Smooth zoom and pan to the selected city or marker."
+    }
+  },
+  "icons": {
+    "library": "lucide-react",
+    "usage": "Use stroke-width 2 or 2.5 for a crisp, technical look."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "url": "https://images.unsplash.com/photo-1705866649609-9ea7159fe1ea?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHwxfHxnYXMlMjBzdGF0aW9uJTIwbWluaW1hbHxlbnwwfHx8fDE3NzU0MTM1NDh8MA&ixlib=rb-4.1.0&q=85",
+        "category": "empty_state_background",
+        "description": "Abstract/Minimal gas station detail for empty states or welcome screen (if any)."
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Ensure the application is wrapped in an Italian locale context (e.g. standardizing decimals with commas for prices, like '1,759 €').",
+    "Use react-leaflet for the map. You MUST implement a custom DivIcon for markers to show the actual price string on the map itself.",
+    "Implement 'Cheapest station highlight' logic: scan the loaded stations, find the minimum price, and apply the 'style_cheapest' class to that specific marker.",
+    "Use `framer-motion` for the List/Map toggle. The map should always render in the background to preserve state, and the List View should animate over it (or hide map conditionally but preserving instance).",
+    "All text must be in Italian ('Cerca città', 'Tipo di Carburante', 'Prezzo', 'Naviga', 'Lista', 'Mappa').",
+    "The 'Naviga' button should format a URL like: `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`.",
+    "Ensure 100% testability by adding `data-testid` attributes to inputs, buttons, map markers, and cards."
+  ]
+}
