@@ -1,72 +1,146 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Query
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
-
+from pydantic import BaseModel
+from typing import List, Optional
+import aiomysql
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
-# Create the main app without a prefix
 app = FastAPI()
-
-# Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# MySQL connection pool
+pool = None
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+MYSQL_CONFIG = {
+    "host": "82.165.170.203",
+    "user": "phpmyadmin",
+    "password": "Moshyrfare@1",
+    "db": "materiali_db",
+    "charset": "utf8mb4",
+    "maxsize": 10,
+    "minsize": 1,
+}
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+async def get_pool():
+    global pool
+    if pool is None:
+        pool = await aiomysql.create_pool(**MYSQL_CONFIG)
+    return pool
 
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+# Models
+class CityResult(BaseModel):
+    comune: str
+    provincia: str
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+class FuelPrice(BaseModel):
+    tipo: str
+    prezzo: float
+    self_service: bool
 
-# Include the router in the main app
+class Station(BaseModel):
+    id: int
+    gestore: str
+    nome: str
+    indirizzo: str
+    lat: Optional[float]
+    lng: Optional[float]
+    prezzi: List[FuelPrice]
+
+
+@api_router.get("/healthz")
+async def health_check():
+    return {"status": "ok"}
+
+
+@api_router.get("/fuel/cities", response_model=List[CityResult])
+async def search_cities(q: str = Query(default="")):
+    p = await get_pool()
+    async with p.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute(
+                "SELECT DISTINCT comune, provincia FROM stations WHERE comune LIKE %s ORDER BY comune LIMIT 10",
+                (f"%{q}%",)
+            )
+            rows = await cur.fetchall()
+    return [CityResult(comune=r["comune"], provincia=r["provincia"]) for r in rows]
+
+
+@api_router.get("/fuel/fuels", response_model=List[str])
+async def list_fuel_types():
+    p = await get_pool()
+    async with p.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute(
+                "SELECT DISTINCT descCarburante FROM station_prices ORDER BY descCarburante"
+            )
+            rows = await cur.fetchall()
+    return [r["descCarburante"] for r in rows]
+
+
+@api_router.get("/fuel/stations", response_model=List[Station])
+async def list_stations(comune: str = Query(...), fuel: Optional[str] = Query(default=None)):
+    p = await get_pool()
+    async with p.acquire() as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            if fuel:
+                join_cond = "s.idImpianto = sp.idImpianto AND sp.descCarburante = %s"
+                query = f"""
+                    SELECT s.idImpianto, s.gestore, s.denominazione, s.indirizzo,
+                           s.comune, s.provincia, s.lat, s.lng,
+                           sp.descCarburante, sp.prezzo, sp.isSelf
+                    FROM stations s
+                    LEFT JOIN station_prices sp ON {join_cond}
+                    WHERE s.comune = %s
+                    ORDER BY sp.prezzo IS NULL, sp.prezzo ASC
+                """
+                params = (fuel, comune)
+            else:
+                query = """
+                    SELECT s.idImpianto, s.gestore, s.denominazione, s.indirizzo,
+                           s.comune, s.provincia, s.lat, s.lng,
+                           sp.descCarburante, sp.prezzo, sp.isSelf
+                    FROM stations s
+                    LEFT JOIN station_prices sp ON s.idImpianto = sp.idImpianto
+                    WHERE s.comune = %s
+                    ORDER BY sp.prezzo IS NULL, sp.prezzo ASC
+                """
+                params = (comune,)
+
+            await cur.execute(query, params)
+            rows = await cur.fetchall()
+
+    station_map = {}
+    for row in rows:
+        sid = row["idImpianto"]
+        if sid not in station_map:
+            lat_val = float(row["lat"]) if row["lat"] is not None else None
+            lng_val = float(row["lng"]) if row["lng"] is not None else None
+            station_map[sid] = Station(
+                id=sid,
+                gestore=row["gestore"] or "",
+                nome=row["denominazione"] or row["indirizzo"] or "",
+                indirizzo=row["indirizzo"] or "",
+                lat=lat_val,
+                lng=lng_val,
+                prezzi=[]
+            )
+        if row["descCarburante"] is not None and row["prezzo"] is not None:
+            station_map[sid].prezzi.append(FuelPrice(
+                tipo=row["descCarburante"],
+                prezzo=float(row["prezzo"]),
+                self_service=bool(row["isSelf"])
+            ))
+
+    return list(station_map.values())
+
+
 app.include_router(api_router)
 
 app.add_middleware(
@@ -77,13 +151,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+async def shutdown():
+    global pool
+    if pool:
+        pool.close()
+        await pool.wait_closed()
