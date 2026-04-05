@@ -6,14 +6,12 @@ import StationList from "@/components/StationList";
 import MapView from "@/components/MapView";
 import StationDetail from "@/components/StationDetail";
 import EmptyState from "@/components/EmptyState";
-import SplashScreen from "@/components/SplashScreen";
 import { useFuelStations } from "@/hooks/useFuelStations";
 import { Map, List, ArrowUpDown, Loader2 } from "lucide-react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from "framer-motion";
 import InstallPrompt from "@/components/InstallPrompt";
 
 function App() {
-  const [splashDone, setSplashDone] = useState(false);
   const [city, setCity] = useState("");
   const [fuel, setFuel] = useState("Gasolio");
   const [viewMode, setViewMode] = useState("map");
@@ -92,9 +90,6 @@ function App() {
 
   return (
     <div data-testid="app-root" className="w-full relative overflow-hidden bg-white" style={{ height: "100dvh", height: "100%" }}>
-      {/* Splash / Welcome screen */}
-      {!splashDone && <SplashScreen onFinish={() => setSplashDone(true)} />}
-
       {/* Map always renders in background — full edge-to-edge */}
       <div className="absolute inset-0">
         <MapView
