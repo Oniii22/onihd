@@ -43,29 +43,29 @@ function StationCard({ station, cheapest, selectedFuel, onClick }) {
       {/* Top row: brand + price */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-gray-900 truncate">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-[15px] font-bold text-gray-900 truncate">
               {station.gestore || "Stazione indipendente"}
             </h3>
             {cheapest && (
-              <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+              <span className="shrink-0 text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
                 Migliore
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1 truncate">
-            <MapPin size={10} strokeWidth={2.5} />
+          <p className="text-[13px] text-gray-400 mt-1 flex items-center gap-1 truncate">
+            <MapPin size={12} strokeWidth={2.5} className="shrink-0" />
             {station.indirizzo}
           </p>
         </div>
 
         {mainPrice && (
           <div className={`shrink-0 text-right ${cheapest ? "text-emerald-600" : "text-gray-900"}`}>
-            <span className="font-mono text-xl font-bold tracking-tighter">
+            <span className="font-mono text-[22px] font-bold tracking-tighter">
               {mainPrice.prezzo.toFixed(3).replace(".", ",")}
             </span>
-            <span className="text-[10px] font-bold text-gray-400 ml-0.5">EUR</span>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">
+            <span className="text-[11px] font-bold text-gray-400 ml-0.5">EUR</span>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">
               {mainPrice.self_service ? "Self" : "Servito"}
             </div>
           </div>
@@ -74,16 +74,16 @@ function StationCard({ station, cheapest, selectedFuel, onClick }) {
 
       {/* Price chips */}
       {otherPrices.length > 0 && (
-        <div className="flex gap-1.5 mt-3 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+        <div className="flex gap-2 mt-3 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           {otherPrices.map((p, i) => (
             <div
               key={`${p.tipo}-${p.self_service}-${i}`}
-              className="shrink-0 bg-gray-50 rounded-lg px-2.5 py-1.5 text-center"
+              className="shrink-0 bg-gray-50 rounded-lg px-3 py-2 text-center min-h-[44px] flex flex-col justify-center"
             >
-              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 truncate max-w-[64px]">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 truncate max-w-[72px]">
                 {p.tipo}
               </div>
-              <div className="font-mono text-xs font-bold text-gray-700">
+              <div className="font-mono text-[13px] font-bold text-gray-700">
                 {p.prezzo.toFixed(3).replace(".", ",")}
               </div>
             </div>
@@ -98,10 +98,10 @@ function StationCard({ station, cheapest, selectedFuel, onClick }) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="mt-3 flex items-center justify-center gap-2 w-full bg-gray-900 text-white py-2.5 rounded-xl text-xs font-bold active:scale-[0.98] transition-transform hover:bg-gray-800"
+          className="mt-3 flex items-center justify-center gap-2 w-full bg-gray-900 text-white min-h-[48px] py-3 rounded-xl text-[14px] font-bold active:scale-[0.98] transition-transform hover:bg-gray-800"
           data-testid={`navigate-btn-${station.id}`}
         >
-          <Navigation size={14} strokeWidth={2.5} />
+          <Navigation size={16} strokeWidth={2.5} />
           Naviga
         </a>
       )}

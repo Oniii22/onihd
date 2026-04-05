@@ -26,15 +26,15 @@ export default function FuelFilter({ selectedFuel, onFuelChange }) {
     <div ref={ref} className="relative" data-testid="fuel-filter-wrapper">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 bg-white/90 backdrop-blur-xl border border-black/5 rounded-full shadow-md px-4 h-10 active:scale-95 transition-all w-full"
+        className="flex items-center gap-2 bg-white/90 backdrop-blur-xl border border-black/5 rounded-full shadow-md px-4 h-[48px] active:scale-95 transition-all w-full"
         data-testid="fuel-filter-trigger"
       >
-        <Droplet size={14} strokeWidth={2.5} className="text-gray-400 shrink-0" />
-        <span className="text-sm font-semibold text-gray-700 flex-1 text-left truncate">
+        <Droplet size={16} strokeWidth={2.5} className="text-gray-400 shrink-0" />
+        <span className="text-[15px] font-semibold text-gray-700 flex-1 text-left truncate">
           {label}
         </span>
         <ChevronDown
-          size={14}
+          size={16}
           strokeWidth={2.5}
           className={`text-gray-400 transition-transform ${open ? "rotate-180" : ""}`}
         />
@@ -96,18 +96,18 @@ export default function FuelFilter({ selectedFuel, onFuelChange }) {
 function FuelOption({ label, selected, onClick, testId }) {
   return (
     <button
-      className={`w-full text-left px-4 py-2.5 flex items-center gap-3 transition-colors ${
+      className={`w-full text-left px-4 py-3 flex items-center gap-3 transition-colors min-h-[48px] ${
         selected ? "bg-gray-900 text-white" : "hover:bg-gray-50 active:bg-gray-100 text-gray-700"
       }`}
       onClick={onClick}
       data-testid={testId}
     >
       <Check
-        size={14}
+        size={16}
         strokeWidth={3}
         className={selected ? "opacity-100" : "opacity-0"}
       />
-      <span className="text-sm font-medium">{label}</span>
+      <span className="text-[15px] font-medium">{label}</span>
     </button>
   );
 }

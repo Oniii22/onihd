@@ -113,23 +113,23 @@ function App() {
 
             {/* List header */}
             {city && sorted.length > 0 && (
-              <div className="flex items-center justify-between px-5 py-2">
+              <div className="flex items-center justify-between px-5 py-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-gray-900">
+                  <span className="text-[15px] font-bold text-gray-900">
                     {sorted.length} distributori
                   </span>
                   {fuel && (
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                    <span className="text-[11px] font-bold uppercase tracking-wider bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">
                       {fuel}
                     </span>
                   )}
                 </div>
                 <button
                   onClick={toggleSort}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+                  className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-500 bg-gray-100 px-4 py-2.5 rounded-full active:scale-95 transition-transform min-h-[44px]"
                   data-testid="sort-toggle"
                 >
-                  <ArrowUpDown size={12} strokeWidth={2.5} />
+                  <ArrowUpDown size={14} strokeWidth={2.5} />
                   Prezzo {sortDir === "asc" ? "↑" : "↓"}
                 </button>
               </div>
@@ -172,7 +172,7 @@ function App() {
 
       {/* Empty state overlay for map mode without city */}
       {viewMode === "map" && !city && (
-        <div className="absolute inset-x-0 bottom-20 z-[500] flex justify-center pointer-events-none">
+        <div className="absolute inset-x-0 bottom-28 z-[500] flex justify-center pointer-events-none">
           <div className="bg-white/90 backdrop-blur-xl border border-black/5 rounded-2xl px-6 py-4 shadow-lg mx-4 text-center pointer-events-auto">
             <p className="text-sm font-semibold text-gray-900">Cerca una citta</p>
             <p className="text-xs text-gray-500 mt-1">Inserisci il nome per trovare i distributori</p>
@@ -184,21 +184,21 @@ function App() {
       <InstallPrompt />
 
       {/* Floating view toggle */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[700]">
+      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-[700]">
         <button
           onClick={toggleView}
-          className="flex items-center gap-2.5 bg-gray-900 text-white pl-5 pr-6 py-3.5 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.3)] active:scale-95 transition-all duration-150 hover:bg-gray-800"
+          className="flex items-center gap-2.5 bg-gray-900 text-white pl-5 pr-6 py-4 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.3)] active:scale-95 transition-all duration-150 hover:bg-gray-800 min-h-[52px]"
           data-testid="view-toggle"
         >
           {viewMode === "map" ? (
             <>
-              <List size={18} strokeWidth={2.5} />
-              <span className="text-sm font-bold tracking-tight">Lista</span>
+              <List size={20} strokeWidth={2.5} />
+              <span className="text-[15px] font-bold tracking-tight">Lista</span>
             </>
           ) : (
             <>
-              <Map size={18} strokeWidth={2.5} />
-              <span className="text-sm font-bold tracking-tight">Mappa</span>
+              <Map size={20} strokeWidth={2.5} />
+              <span className="text-[15px] font-bold tracking-tight">Mappa</span>
             </>
           )}
         </button>

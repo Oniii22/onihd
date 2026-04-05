@@ -43,6 +43,28 @@ html, body, #root {
   -moz-osx-font-smoothing: grayscale;
   background: #ffffff;
   color: #111827;
+  /* Safe area for notched phones */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Prevent iOS zoom on input focus — font-size must be >= 16px */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* Minimum touch target size */
+button, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Links that are styled as buttons should have min touch target */
+a.touch-target {
+  min-height: 44px;
+  min-width: 44px;
 }
 
 /* Leaflet overrides for a clean look */

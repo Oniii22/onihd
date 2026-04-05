@@ -39,7 +39,7 @@ export default function CitySearch({ value, onChange }) {
         <input
           type="text"
           placeholder="Cerca citta (es. Milano)"
-          className="w-full h-12 pl-11 pr-10 bg-white/90 backdrop-blur-xl border border-black/5 rounded-full shadow-lg text-sm font-medium text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-black/10 transition-shadow"
+          className="w-full h-[48px] pl-11 pr-10 bg-white/90 backdrop-blur-xl border border-black/5 rounded-full shadow-lg text-[16px] font-medium text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-black/10 transition-shadow"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
@@ -54,10 +54,10 @@ export default function CitySearch({ value, onChange }) {
         {value && (
           <button
             onClick={() => { onChange(""); setQuery(""); }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 active:scale-90 transition-transform"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 active:scale-90 transition-transform"
             data-testid="clear-search"
           >
-            <X size={14} strokeWidth={2.5} />
+            <X size={16} strokeWidth={2.5} />
           </button>
         )}
       </div>
@@ -71,14 +71,14 @@ export default function CitySearch({ value, onChange }) {
               {cities.map((c, i) => (
                 <li key={`${c.comune}-${c.provincia}-${i}`}>
                   <button
-                    className="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors flex items-center gap-3"
+                    className="w-full text-left px-4 py-3.5 hover:bg-gray-50 active:bg-gray-100 transition-colors flex items-center gap-3 min-h-[48px]"
                     onClick={() => { onChange(c.comune); setQuery(c.comune); setOpen(false); }}
                     data-testid={`city-option-${c.comune}`}
                   >
                     <MapPin size={16} strokeWidth={2.5} className="text-gray-400 shrink-0" />
                     <div>
-                      <span className="text-sm font-semibold text-gray-900 block">{c.comune}</span>
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{c.provincia}</span>
+                      <span className="text-[15px] font-semibold text-gray-900 block">{c.comune}</span>
+                      <span className="text-[12px] font-bold uppercase tracking-wider text-gray-400">{c.provincia}</span>
                     </div>
                   </button>
                 </li>
