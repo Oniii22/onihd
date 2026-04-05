@@ -37,7 +37,90 @@
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
-        <div id="root"></div>
+
+        <div id="root" style="opacity: 0; transition: opacity 0.4s ease;"></div>
+
+        <!-- Native splash screen - shows INSTANTLY before React loads, rendered AFTER #root to stack on top -->
+        <div id="native-splash" style="
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #030712;
+            transition: opacity 0.5s ease;
+            isolation: isolate;
+        ">
+            <div style="
+                width: 80px; height: 80px;
+                background: #10B981;
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 0 60px rgba(16,185,129,0.3);
+                animation: splashPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                opacity: 0;
+            ">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <path d="M20 4C24.5 13 30 18 30 24C30 30 25.5 34 20 34C14.5 34 10 30 10 24C10 18 15.5 13 20 4Z" fill="white" opacity="0.9"/>
+                    <text x="20" y="27" text-anchor="middle" fill="#10B981" font-weight="800" font-size="14" font-family="system-ui">€</text>
+                </svg>
+            </div>
+            <h1 style="
+                margin-top: 32px;
+                font-family: 'Work Sans', -apple-system, sans-serif;
+                font-size: 28px;
+                font-weight: 800;
+                color: white;
+                letter-spacing: -0.02em;
+                animation: splashFadeUp 0.5s ease forwards 0.3s;
+                opacity: 0;
+            ">PienoPerfetto</h1>
+            <p style="
+                margin-top: 8px;
+                font-family: 'Work Sans', -apple-system, sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                color: #9CA3AF;
+                animation: splashFadeUp 0.5s ease forwards 0.5s;
+                opacity: 0;
+            ">Il miglior prezzo, sempre.</p>
+            <div style="
+                margin-top: 40px;
+                width: 128px;
+                height: 4px;
+                background: #1F2937;
+                border-radius: 999px;
+                overflow: hidden;
+                animation: splashFadeUp 0.3s ease forwards 0.7s;
+                opacity: 0;
+            ">
+                <div style="
+                    height: 100%;
+                    background: #10B981;
+                    border-radius: 999px;
+                    animation: splashBar 2s ease forwards 0.8s;
+                    width: 0%;
+                "></div>
+            </div>
+            <style>
+                @keyframes splashPop {
+                    0% { opacity: 0; transform: scale(0) rotate(-30deg); }
+                    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+                }
+                @keyframes splashFadeUp {
+                    0% { opacity: 0; transform: translateY(12px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes splashBar {
+                    0% { width: 0%; }
+                    100% { width: 100%; }
+                }
+            </style>
+        </div>
         <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
