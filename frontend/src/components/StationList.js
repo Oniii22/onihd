@@ -35,7 +35,9 @@ export default function StationList({ stations, cheapestId, selectedFuel, onSele
 function StationCard({ station, cheapest, selectedFuel, onClick }) {
   const mainPrice = selectedFuel
     ? station.prezzi.find((p) => p.tipo === selectedFuel)
-    : station.prezzi[0];
+    : station.prezzi.length > 0
+      ? station.prezzi.reduce((best, p) => p.prezzo < best.prezzo ? p : best)
+      : null;
 
   const otherPrices = station.prezzi
     .filter((p) => p !== mainPrice)

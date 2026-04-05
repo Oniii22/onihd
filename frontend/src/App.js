@@ -27,19 +27,28 @@ function App() {
       fuel ? s.prezzi.some((p) => p.tipo === fuel) : s.prezzi.length > 0
     );
 
-    if (fuel) {
-      filtered.sort((a, b) => {
-        const pA = a.prezzi.find((p) => p.tipo === fuel)?.prezzo ?? Infinity;
-        const pB = b.prezzi.find((p) => p.tipo === fuel)?.prezzo ?? Infinity;
-        return sortDir === "asc" ? pA - pB : pB - pA;
-      });
-    }
+    // Get the relevant price for a station
+    const getPrice = (s) => {
+      if (fuel) {
+        return s.prezzi.find((p) => p.tipo === fuel)?.prezzo ?? Infinity;
+      }
+      // No fuel selected: use the cheapest price across all fuel types
+      return s.prezzi.length > 0
+        ? Math.min(...s.prezzi.map((p) => p.prezzo))
+        : Infinity;
+    };
 
+    // Always sort by price
+    filtered.sort((a, b) => {
+      const pA = getPrice(a);
+      const pB = getPrice(b);
+      return sortDir === "asc" ? pA - pB : pB - pA;
+    });
+
+    // Cheapest is always the one with lowest price (regardless of sort direction)
     const cId = filtered.length > 0
       ? filtered.reduce((best, s) => {
-          const bP = best.prezzi.find((p) => !fuel || p.tipo === fuel)?.prezzo ?? Infinity;
-          const sP = s.prezzi.find((p) => !fuel || p.tipo === fuel)?.prezzo ?? Infinity;
-          return sP < bP ? s : best;
+          return getPrice(s) < getPrice(best) ? s : best;
         }).id
       : null;
 

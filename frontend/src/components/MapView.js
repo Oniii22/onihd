@@ -160,9 +160,12 @@ export default function MapView({
             noPrice = true;
           }
         } else if (station.prezzi.length > 0) {
-          const p = station.prezzi[0];
-          displayPrice = p.prezzo.toFixed(3);
-          isSelf = p.self_service;
+          // No fuel selected: show the cheapest price across all types
+          const cheapest = station.prezzi.reduce((best, p) =>
+            p.prezzo < best.prezzo ? p : best
+          );
+          displayPrice = cheapest.prezzo.toFixed(3);
+          isSelf = cheapest.self_service;
         } else {
           noPrice = true;
         }
