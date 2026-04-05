@@ -103,6 +103,11 @@ a.touch-target {
   border-radius: 6px 0 0 0 !important;
 }
 
+/* Ad placeholder — hidden when real ad loads */
+.ad-container .adsbygoogle[data-ad-status="filled"] + .ad-placeholder {
+  display: none;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 4px;

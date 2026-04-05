@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Navigation, X } from "lucide-react";
+import AdBanner from "@/components/AdBanner";
 
 export default function StationDetail({ station, cheapest, selectedFuel, onClose }) {
   const mainPrice = selectedFuel
@@ -19,7 +20,8 @@ export default function StationDetail({ station, cheapest, selectedFuel, onClose
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 120, opacity: 0 }}
       transition={{ type: "spring", damping: 28, stiffness: 350 }}
-      className="absolute bottom-28 left-3 right-3 z-[800] bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_-2px_30px_rgba(0,0,0,0.12)] border border-black/5"
+      className="absolute left-3 right-3 z-[800] bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_-2px_30px_rgba(0,0,0,0.12)] border border-black/5"
+      style={{ bottom: "100px" }}
       data-testid="station-detail-card"
     >
       {/* Header */}
@@ -80,9 +82,14 @@ export default function StationDetail({ station, cheapest, selectedFuel, onClose
         </div>
       )}
 
+      {/* #4: AdSense banner in station detail */}
+      <div className="px-4 pb-2">
+        <AdBanner slot="DETAIL_AD_SLOT" format="horizontal" className="rounded-xl" />
+      </div>
+
       {/* Navigate CTA */}
       {mapsUrl && (
-        <div className="px-4 pb-4 pt-1">
+        <div className="px-4 pb-4">
           <a
             href={mapsUrl}
             target="_blank"

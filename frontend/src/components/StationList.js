@@ -1,17 +1,33 @@
 import { MapPin, Navigation } from "lucide-react";
+import AdBanner from "@/components/AdBanner";
 
 export default function StationList({ stations, cheapestId, selectedFuel, onSelect }) {
+  const items = [];
+
+  stations.forEach((station, i) => {
+    items.push(
+      <StationCard
+        key={station.id}
+        station={station}
+        cheapest={station.id === cheapestId}
+        selectedFuel={selectedFuel}
+        onClick={() => onSelect(station)}
+      />
+    );
+
+    // #5: Insert ad after every 3 stations
+    if ((i + 1) % 3 === 0 && i < stations.length - 1) {
+      items.push(
+        <div key={`ad-${i}`} className="mx-4">
+          <AdBanner slot="LIST_AD_SLOT" format="fluid" className="my-1" />
+        </div>
+      );
+    }
+  });
+
   return (
     <div className="px-4 py-2 space-y-2.5 stagger-children" data-testid="station-list">
-      {stations.map((station) => (
-        <StationCard
-          key={station.id}
-          station={station}
-          cheapest={station.id === cheapestId}
-          selectedFuel={selectedFuel}
-          onClick={() => onSelect(station)}
-        />
-      ))}
+      {items}
     </div>
   );
 }

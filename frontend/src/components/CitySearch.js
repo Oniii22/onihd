@@ -11,7 +11,7 @@ function useDebounce(value, delay) {
   return debounced;
 }
 
-export default function CitySearch({ value, onChange }) {
+export default function CitySearch({ value, onChange, onInteract }) {
   const [query, setQuery] = useState(value);
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef(null);
@@ -42,7 +42,7 @@ export default function CitySearch({ value, onChange }) {
           className="w-full h-[48px] pl-11 pr-10 bg-white/90 backdrop-blur-xl border border-black/5 rounded-full shadow-lg text-[16px] font-medium text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-black/10 transition-shadow"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => { setOpen(true); if (onInteract) onInteract(); }}
           data-testid="input-city-search"
         />
         {loading && (

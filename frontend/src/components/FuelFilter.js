@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useFuelTypes } from "@/hooks/useFuelStations";
 import { Droplet, ChevronDown, Check } from "lucide-react";
 
-export default function FuelFilter({ selectedFuel, onFuelChange }) {
+export default function FuelFilter({ selectedFuel, onFuelChange, onInteract }) {
   const fuels = useFuelTypes();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -22,10 +22,15 @@ export default function FuelFilter({ selectedFuel, onFuelChange }) {
   const popularFuels = popular.filter((f) => fuels.includes(f));
   const otherFuels = fuels.filter((f) => !popular.includes(f));
 
+  const handleOpen = () => {
+    setOpen(!open);
+    if (!open && onInteract) onInteract(); // #7: notify parent to close list
+  };
+
   return (
     <div ref={ref} className="relative" data-testid="fuel-filter-wrapper">
       <button
-        onClick={() => setOpen(!open)}
+        onClick={handleOpen}
         className="flex items-center gap-2 bg-white/90 backdrop-blur-xl border border-black/5 rounded-full shadow-md px-4 h-[48px] active:scale-95 transition-all w-full"
         data-testid="fuel-filter-trigger"
       >

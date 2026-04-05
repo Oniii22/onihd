@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useRef } from "react";
 import "@/App.css";
 import CitySearch from "@/components/CitySearch";
 import FuelFilter from "@/components/FuelFilter";
@@ -8,7 +8,7 @@ import StationDetail from "@/components/StationDetail";
 import EmptyState from "@/components/EmptyState";
 import { useFuelStations } from "@/hooks/useFuelStations";
 import { Map, List, ArrowUpDown } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from "framer-motion";
 import InstallPrompt from "@/components/InstallPrompt";
 
 function App() {
@@ -49,6 +49,12 @@ function App() {
   const handleCityChange = useCallback((v) => {
     setCity(v);
     setSelectedStation(null);
+    setViewMode("map"); // #7: close list when editing city
+  }, []);
+
+  const handleFuelChange = useCallback((v) => {
+    setFuel(v);
+    setViewMode("map"); // #7: close list when editing fuel
   }, []);
 
   const handleStationSelect = useCallback((station) => {
@@ -63,6 +69,10 @@ function App() {
   const toggleView = useCallback(() => {
     setViewMode((v) => (v === "map" ? "list" : "map"));
     setSelectedStation(null);
+  }, []);
+
+  const closeList = useCallback(() => {
+    setViewMode("map");
   }, []);
 
   const toggleSort = useCallback(() => {
@@ -86,31 +96,17 @@ function App() {
       {/* Top floating controls */}
       <div className="absolute top-0 left-0 right-0 z-[500] pointer-events-none">
         <div className="p-4 pb-0 pointer-events-auto">
-          <CitySearch value={city} onChange={handleCityChange} />
+          <CitySearch value={city} onChange={handleCityChange} onInteract={closeList} />
         </div>
         <div className="px-4 pt-3 pointer-events-auto">
-          <FuelFilter selectedFuel={fuel} onFuelChange={setFuel} />
+          <FuelFilter selectedFuel={fuel} onFuelChange={handleFuelChange} onInteract={closeList} />
         </div>
       </div>
 
-      {/* List view - slides up over map */}
+      {/* List view - slides up over map, draggable to close (#3) */}
       <AnimatePresence>
         {viewMode === "list" && (
-          <motion.div
-            key="list-view"
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 300 }}
-            className="absolute inset-x-0 bottom-0 z-[600] bg-white rounded-t-3xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)]"
-            style={{ top: "140px" }}
-            data-testid="list-view-panel"
-          >
-            {/* Handle bar */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-gray-300" />
-            </div>
-
+          <DraggableListPanel onClose={closeList}>
             {/* List header */}
             {city && sorted.length > 0 && (
               <div className="flex items-center justify-between px-5 py-3">
@@ -136,13 +132,13 @@ function App() {
             )}
 
             {/* List content */}
-            <div className="overflow-y-auto pb-24" style={{ maxHeight: "calc(100vh - 220px)" }}>
+            <div className="overflow-y-auto pb-28" style={{ maxHeight: "calc(100vh - 230px)" }}>
               {!city ? (
                 <EmptyState />
               ) : loading ? (
                 <LoadingSkeleton />
               ) : sorted.length === 0 ? (
-                <div className="text-center py-16 text-gray-400 text-sm font-medium">
+                <div className="text-center py-16 text-gray-400 text-[15px] font-medium">
                   Nessun distributore trovato.
                 </div>
               ) : (
@@ -154,11 +150,11 @@ function App() {
                 />
               )}
             </div>
-          </motion.div>
+          </DraggableListPanel>
         )}
       </AnimatePresence>
 
-      {/* Station detail bottom card (map mode) */}
+      {/* Station detail bottom card (map mode) — #6: positioned above toggle */}
       <AnimatePresence>
         {viewMode === "map" && selectedStation && (
           <StationDetail
@@ -170,12 +166,12 @@ function App() {
         )}
       </AnimatePresence>
 
-      {/* Empty state overlay for map mode without city */}
+      {/* #1: Empty state hint — moved higher, above toggle */}
       {viewMode === "map" && !city && (
-        <div className="absolute inset-x-0 bottom-28 z-[500] flex justify-center pointer-events-none">
-          <div className="bg-white/90 backdrop-blur-xl border border-black/5 rounded-2xl px-6 py-4 shadow-lg mx-4 text-center pointer-events-auto">
-            <p className="text-sm font-semibold text-gray-900">Cerca una citta</p>
-            <p className="text-xs text-gray-500 mt-1">Inserisci il nome per trovare i distributori</p>
+        <div className="absolute inset-x-0 z-[500] flex justify-center pointer-events-none" style={{ bottom: "50%" }}>
+          <div className="bg-white/95 backdrop-blur-xl border border-black/5 rounded-2xl px-6 py-5 shadow-lg mx-6 text-center pointer-events-auto">
+            <p className="text-[15px] font-bold text-gray-900">Cerca una citta</p>
+            <p className="text-[13px] text-gray-500 mt-1.5">Inserisci il nome per trovare i distributori</p>
           </div>
         </div>
       )}
@@ -183,11 +179,11 @@ function App() {
       {/* PWA Install Prompt */}
       <InstallPrompt />
 
-      {/* Floating view toggle */}
+      {/* #2: Floating view toggle — emerald accent color for visibility */}
       <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-[700]">
         <button
           onClick={toggleView}
-          className="flex items-center gap-2.5 bg-gray-900 text-white pl-5 pr-6 py-4 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.3)] active:scale-95 transition-all duration-150 hover:bg-gray-800 min-h-[52px]"
+          className="flex items-center gap-2.5 bg-emerald-500 text-white pl-5 pr-6 py-4 rounded-full shadow-[0_4px_20px_rgba(16,185,129,0.4)] active:scale-95 transition-all duration-150 hover:bg-emerald-600 min-h-[52px]"
           data-testid="view-toggle"
         >
           {viewMode === "map" ? (
@@ -204,6 +200,52 @@ function App() {
         </button>
       </div>
     </div>
+  );
+}
+
+/* #3: Draggable list panel — swipe down to close */
+function DraggableListPanel({ onClose, children }) {
+  const y = useMotionValue(0);
+  const controls = useAnimation();
+  const scrollRef = useRef(null);
+  const isDraggingHandle = useRef(false);
+
+  const handleDragEnd = (_, info) => {
+    if (info.offset.y > 100 || info.velocity.y > 400) {
+      onClose();
+    } else {
+      controls.start({ y: 0 });
+    }
+    isDraggingHandle.current = false;
+  };
+
+  return (
+    <motion.div
+      key="list-view"
+      initial={{ y: "100%" }}
+      animate={{ y: 0 }}
+      exit={{ y: "100%" }}
+      transition={{ type: "spring", damping: 28, stiffness: 300 }}
+      className="absolute inset-x-0 bottom-0 z-[600] bg-white rounded-t-3xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)]"
+      style={{ top: "140px", y }}
+      data-testid="list-view-panel"
+    >
+      {/* Drag handle area */}
+      <motion.div
+        className="cursor-grab active:cursor-grabbing touch-none"
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.4}
+        onDragEnd={handleDragEnd}
+        style={{ y }}
+      >
+        <div className="flex justify-center pt-3.5 pb-2">
+          <div className="w-10 h-1.5 rounded-full bg-gray-300" />
+        </div>
+      </motion.div>
+
+      {children}
+    </motion.div>
   );
 }
 
