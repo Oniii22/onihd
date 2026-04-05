@@ -80,8 +80,8 @@ function App() {
   }, []);
 
   return (
-    <div data-testid="app-root" className="h-full w-full relative overflow-hidden bg-white">
-      {/* Map always renders in background */}
+    <div data-testid="app-root" className="w-full relative overflow-hidden bg-white" style={{ height: "100dvh", height: "100%" }}>
+      {/* Map always renders in background — full edge-to-edge */}
       <div className="absolute inset-0">
         <MapView
           stations={sorted}
@@ -93,9 +93,9 @@ function App() {
         />
       </div>
 
-      {/* Top floating controls */}
-      <div className="absolute top-0 left-0 right-0 z-[500] pointer-events-none">
-        <div className="p-4 pb-0 pointer-events-auto">
+      {/* Top floating controls — safe area inset for notch */}
+      <div className="absolute top-0 left-0 right-0 z-[500] pointer-events-none" style={{ paddingTop: "max(16px, env(safe-area-inset-top))" }}>
+        <div className="px-4 pb-0 pointer-events-auto">
           <CitySearch value={city} onChange={handleCityChange} onInteract={closeList} />
         </div>
         <div className="px-4 pt-3 pointer-events-auto">
@@ -166,9 +166,9 @@ function App() {
         )}
       </AnimatePresence>
 
-      {/* #1: Empty state hint — moved higher, above toggle */}
+      {/* #1: Empty state hint — centered on screen */}
       {viewMode === "map" && !city && (
-        <div className="absolute inset-x-0 z-[500] flex justify-center pointer-events-none" style={{ bottom: "50%" }}>
+        <div className="absolute inset-x-0 z-[500] flex justify-center pointer-events-none" style={{ top: "45%" }}>
           <div className="bg-white/95 backdrop-blur-xl border border-black/5 rounded-2xl px-6 py-5 shadow-lg mx-6 text-center pointer-events-auto">
             <p className="text-[15px] font-bold text-gray-900">Cerca una citta</p>
             <p className="text-[13px] text-gray-500 mt-1.5">Inserisci il nome per trovare i distributori</p>
@@ -179,8 +179,8 @@ function App() {
       {/* PWA Install Prompt */}
       <InstallPrompt />
 
-      {/* #2: Floating view toggle — emerald accent color for visibility */}
-      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-[700]">
+      {/* #2: Floating view toggle — safe area for home indicator */}
+      <div className="absolute left-1/2 -translate-x-1/2 z-[700]" style={{ bottom: "max(64px, calc(env(safe-area-inset-bottom) + 48px))" }}>
         <button
           onClick={toggleView}
           className="flex items-center gap-2.5 bg-emerald-500 text-white pl-5 pr-6 py-4 rounded-full shadow-[0_4px_20px_rgba(16,185,129,0.4)] active:scale-95 transition-all duration-150 hover:bg-emerald-600 min-h-[52px]"
@@ -227,7 +227,7 @@ function DraggableListPanel({ onClose, children }) {
       exit={{ y: "100%" }}
       transition={{ type: "spring", damping: 28, stiffness: 300 }}
       className="absolute inset-x-0 bottom-0 z-[600] bg-white rounded-t-3xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)]"
-      style={{ top: "140px", y }}
+      style={{ top: "max(140px, calc(env(safe-area-inset-top) + 120px))", y }}
       data-testid="list-view-panel"
     >
       {/* Drag handle area */}

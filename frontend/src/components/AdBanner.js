@@ -1,39 +1,53 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const ADSENSE_CLIENT = "ca-pub-0000000000000000"; // Replace with your AdSense publisher ID
+const IS_TEST = ADSENSE_CLIENT.includes("0000000000");
 
 export default function AdBanner({ slot = "1234567890", format = "auto", className = "" }) {
   const adRef = useRef(null);
   const pushed = useRef(false);
 
   useEffect(() => {
-    if (pushed.current) return;
+    if (IS_TEST || pushed.current) return;
     try {
       if (window.adsbygoogle && adRef.current) {
         window.adsbygoogle.push({});
         pushed.current = true;
       }
     } catch (e) {
-      // AdSense not loaded yet or blocked
+      // AdSense not loaded
     }
   }, []);
 
+  // Show placeholder when using test IDs
+  if (IS_TEST) {
+    return (
+      <div
+        className={`flex items-center justify-center h-[50px] bg-gray-100 rounded-xl ${className}`}
+        data-testid={`ad-banner-${slot}`}
+      >
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-300">
+          Annuncio
+        </span>
+      </div>
+    );
+  }
+
+  // Real AdSense ad
   return (
     <div
-      className={`ad-container overflow-hidden bg-gray-50 rounded-xl ${className}`}
+      className={`ad-container overflow-hidden rounded-xl ${className}`}
       data-testid={`ad-banner-${slot}`}
       ref={adRef}
     >
       <ins
         className="adsbygoogle"
-        style={{ display: "block", minHeight: "50px" }}
-        data-ad-client="ca-pub-0000000000000000"
+        style={{ display: "block" }}
+        data-ad-client={ADSENSE_CLIENT}
         data-ad-slot={slot}
         data-ad-format={format}
         data-full-width-responsive="true"
       />
-      {/* Placeholder visible when AdSense hasn't loaded */}
-      <div className="ad-placeholder flex items-center justify-center py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-gray-300">
-        Annuncio
-      </div>
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function StationDetail({ station, cheapest, selectedFuel, onClose
       exit={{ y: 120, opacity: 0 }}
       transition={{ type: "spring", damping: 28, stiffness: 350 }}
       className="absolute left-3 right-3 z-[800] bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_-2px_30px_rgba(0,0,0,0.12)] border border-black/5"
-      style={{ bottom: "100px" }}
+      style={{ bottom: "max(110px, calc(env(safe-area-inset-bottom) + 90px))" }}
       data-testid="station-detail-card"
     >
       {/* Header */}
