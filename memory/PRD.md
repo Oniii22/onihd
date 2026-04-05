@@ -1,31 +1,57 @@
-# PRD - Fuel Price Finder Deployment Guide
+# PRD - PienoPerfetto - Fuel Price Finder
 
 ## Original Problem Statement
-User wants deployment instructions to run their Fuel Price Finder app on an Ubuntu VPS for public use.
+Rebuild an Italian fuel price comparison app (PienoPerfetto) with mobile-first design, modern animated styles, Italian UI language. Connect to existing MySQL database at 82.165.170.203 for live fuel station data.
 
-## App Architecture
-- **Monorepo**: pnpm workspaces (TypeScript)
-- **Frontend**: React + Vite + Tailwind CSS + Leaflet maps (`artifacts/fuel-finder`)
-- **Backend**: Express 5 API server (`artifacts/api-server`)
-- **Database**: Remote MySQL at `82.165.170.203` (`materiali_db`)
-- **Build**: esbuild (backend), Vite (frontend)
-- **Node.js**: v24+
+## Architecture
+- **Backend**: FastAPI (Python) → Remote MySQL via aiomysql
+- **Frontend**: React + Tailwind CSS + Leaflet + Framer Motion
+- **Database**: MySQL at 82.165.170.203 (materiali_db - stations & station_prices tables)
+- **Hosting**: Emergent preview environment
 
-## What's Been Implemented
-- [2026-01-28] Created comprehensive Ubuntu VPS deployment guide (`/app/DEPLOYMENT_GUIDE.md`)
-  - System prerequisites (Node.js 24, pnpm, Nginx, PM2)
-  - Project upload (Git or SCP)
-  - Build instructions
-  - PM2 process management
-  - Nginx reverse proxy configuration (static files + API proxy)
-  - Firewall setup (UFW)
-  - Optional SSL with Let's Encrypt
-  - Security improvements (env vars for MySQL creds)
-  - PM2 ecosystem file
-  - Troubleshooting guide
+## User Personas
+- Italian drivers looking for cheapest fuel nearby
+- Mobile-first users comparing fuel prices across stations in their city
+
+## Core Requirements
+- City autocomplete search (Italian cities)
+- Fuel type filter (Gasolio, Benzina, GPL, Metano, etc.)
+- Interactive Leaflet map with custom price markers
+- Station list view sorted by price
+- Cheapest station highlighted
+- Google Maps navigation integration
+- Mobile-optimized responsive design
+
+## What's Been Implemented [2026-01-28]
+### Backend (FastAPI)
+- GET /api/healthz - Health check
+- GET /api/fuel/cities?q= - City autocomplete search
+- GET /api/fuel/fuels - List all fuel types
+- GET /api/fuel/stations?comune=&fuel= - List stations with prices
+- All endpoints connect to remote MySQL via aiomysql async driver
+
+### Frontend (React)
+- Full-bleed Leaflet map as primary canvas (CARTO light tiles)
+- Glassmorphism floating search bar with autocomplete
+- Fuel type dropdown filter with popular/other categories
+- Map view with custom DivIcon price markers (white/green/selected states)
+- Marker clustering for dense areas
+- List view with animated slide-up panel (framer-motion spring animation)
+- Station cards with price display (Italian comma formatting), address, Navigate button
+- Station detail bottom card on map marker selection
+- Floating pill toggle for List/Map switch (black pill, white text)
+- Cheapest station highlight ("Migliore" badge, green accent)
+- Staggered CSS animations for list items
+- Work Sans + JetBrains Mono typography
+
+### Testing
+- 100% backend test pass rate
+- 100% frontend test pass rate
+- 100% integration test pass rate
 
 ## Backlog
-- P1: Move hardcoded MySQL credentials to environment variables
-- P2: Add CI/CD pipeline for automated deployments
-- P2: Add monitoring/alerting (e.g., PM2 monitoring, Uptime Robot)
-- P3: Add Docker containerization option
+- P1: GPS-based "stations near me" feature
+- P2: Favorites / bookmarked stations
+- P2: Price history charts
+- P3: Price alerts / notifications
+- P3: Dark mode toggle
