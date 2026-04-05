@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#111827"/>
+  <g transform="translate(256,240)" fill="none" stroke="#fff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Fuel droplet -->
+    <path d="M0,-100 C55,0 80,50 80,90 C80,135 44,170 0,170 C-44,170 -80,135 -80,90 C-80,50 -55,0 0,-100Z" fill="#10B981" stroke="none"/>
+    <!-- Euro symbol inside -->
+    <text x="0" y="30" text-anchor="middle" font-family="system-ui" font-weight="800" font-size="120" fill="#fff" stroke="none">€</text>
+  </g>
+</svg>

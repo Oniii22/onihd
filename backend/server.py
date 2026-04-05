@@ -18,10 +18,10 @@ api_router = APIRouter(prefix="/api")
 pool = None
 
 MYSQL_CONFIG = {
-    "host": os.environ.get("MYSQL_HOST", "82.165.170.203"),
-    "user": os.environ.get("MYSQL_USER", "phpmyadmin"),
-    "password": os.environ.get("MYSQL_PASSWORD", "Moshyrfare@1"),
-    "db": os.environ.get("MYSQL_DB", "materiali_db"),
+    "host": os.environ["MYSQL_HOST"],
+    "user": os.environ["MYSQL_USER"],
+    "password": os.environ["MYSQL_PASSWORD"],
+    "db": os.environ["MYSQL_DB"],
     "charset": "utf8mb4",
     "maxsize": 10,
     "minsize": 1,

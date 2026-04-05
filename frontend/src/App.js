@@ -9,6 +9,7 @@ import EmptyState from "@/components/EmptyState";
 import { useFuelStations } from "@/hooks/useFuelStations";
 import { Map, List, ArrowUpDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import InstallPrompt from "@/components/InstallPrompt";
 
 function App() {
   const [city, setCity] = useState("");
@@ -178,6 +179,9 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* PWA Install Prompt */}
+      <InstallPrompt />
 
       {/* Floating view toggle */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[700]">
