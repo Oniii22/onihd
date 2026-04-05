@@ -142,8 +142,8 @@ export default function MapView({
   onStationSelect,
   hasCity,
 }) {
-  const markers = useMemo(() => {
-    return stations
+  const { regularMarkers, cheapestMarker } = useMemo(() => {
+    const all = stations
       .filter((s) => s.lat != null && s.lng != null)
       .map((station) => {
         const isSelected = station.id === selectedStation?.id;
@@ -160,7 +160,6 @@ export default function MapView({
             noPrice = true;
           }
         } else if (station.prezzi.length > 0) {
-          // No fuel selected: show the cheapest price across all types
           const cheapest = station.prezzi.reduce((best, p) =>
             p.prezzo < best.prezzo ? p : best
           );
@@ -176,8 +175,15 @@ export default function MapView({
           station,
           icon: createPriceIcon(displayPrice, isCheapest, isSelf, noPrice, isSelected),
           zIndex: isSelected ? 1000 : isCheapest ? 500 : 0,
+          isCheapest,
         };
       });
+
+    // Separate cheapest marker so it renders OUTSIDE the cluster (always visible)
+    const cheapest = all.find((m) => m.isCheapest) || null;
+    const regular = all.filter((m) => !m.isCheapest);
+
+    return { regularMarkers: regular, cheapestMarker: cheapest };
   }, [stations, selectedFuel, cheapestStationId, selectedStation]);
 
   return (
@@ -197,6 +203,7 @@ export default function MapView({
         {hasCity && <FitBounds stations={stations} />}
         <PanTo station={selectedStation} />
 
+        {/* Regular stations in cluster group */}
         <MarkerClusterGroup
           chunkedLoading
           iconCreateFunction={createClusterIcon}
@@ -205,7 +212,7 @@ export default function MapView({
           spiderfyOnMaxZoom
           disableClusteringAtZoom={16}
         >
-          {markers.map(({ station, icon, zIndex }) => (
+          {regularMarkers.map(({ station, icon, zIndex }) => (
             <Marker
               key={station.id}
               position={[station.lat, station.lng]}
@@ -217,6 +224,19 @@ export default function MapView({
             />
           ))}
         </MarkerClusterGroup>
+
+        {/* Cheapest station ALWAYS visible on top, outside clusters */}
+        {cheapestMarker && (
+          <Marker
+            key={`cheapest-${cheapestMarker.station.id}`}
+            position={[cheapestMarker.station.lat, cheapestMarker.station.lng]}
+            icon={cheapestMarker.icon}
+            zIndexOffset={900}
+            eventHandlers={{
+              click: () => onStationSelect(cheapestMarker.station),
+            }}
+          />
+        )}
       </MapContainer>
     </div>
   );
