@@ -18,10 +18,10 @@ api_router = APIRouter(prefix="/api")
 pool = None
 
 MYSQL_CONFIG = {
-    "host": "82.165.170.203",
-    "user": "phpmyadmin",
-    "password": "Moshyrfare@1",
-    "db": "materiali_db",
+    "host": os.environ.get("MYSQL_HOST", "82.165.170.203"),
+    "user": os.environ.get("MYSQL_USER", "phpmyadmin"),
+    "password": os.environ.get("MYSQL_PASSWORD", "Moshyrfare@1"),
+    "db": os.environ.get("MYSQL_DB", "materiali_db"),
     "charset": "utf8mb4",
     "maxsize": 10,
     "minsize": 1,
@@ -78,7 +78,7 @@ async def list_fuel_types():
     async with p.acquire() as conn:
         async with conn.cursor(aiomysql.DictCursor) as cur:
             await cur.execute(
-                "SELECT DISTINCT descCarburante FROM station_prices ORDER BY descCarburante"
+                "SELECT DISTINCT descCarburante FROM station_prices ORDER BY descCarburante LIMIT 100"
             )
             rows = await cur.fetchall()
     return [r["descCarburante"] for r in rows]
