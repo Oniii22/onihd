@@ -7,7 +7,7 @@ import MapView from "@/components/MapView";
 import StationDetail from "@/components/StationDetail";
 import EmptyState from "@/components/EmptyState";
 import { useFuelStations } from "@/hooks/useFuelStations";
-import { Map, List, ArrowUpDown } from "lucide-react";
+import { Map, List, ArrowUpDown, Loader2 } from "lucide-react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from "framer-motion";
 import InstallPrompt from "@/components/InstallPrompt";
 
@@ -92,6 +92,25 @@ function App() {
           hasCity={!!city}
         />
       </div>
+
+      {/* Loading overlay when fetching stations */}
+      <AnimatePresence>
+        {loading && city && (
+          <motion.div
+            key="loading-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 z-[450] flex items-center justify-center pointer-events-none"
+          >
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl px-6 py-4 shadow-lg flex items-center gap-3">
+              <Loader2 size={20} strokeWidth={2.5} className="text-emerald-500 spin-pulse" />
+              <span className="text-[14px] font-semibold text-gray-700">Aggiornamento prezzi...</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Top floating controls — safe area inset for notch */}
       <div className="absolute top-0 left-0 right-0 z-[500] pointer-events-none" style={{ paddingTop: "max(16px, env(safe-area-inset-top))" }}>

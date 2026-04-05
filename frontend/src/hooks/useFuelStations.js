@@ -15,6 +15,8 @@ export function useFuelStations(city, fuel) {
 
     let cancelled = false;
     setLoading(true);
+    const startTime = Date.now();
+    const MIN_LOADING_MS = 500; // minimum visible loading time
 
     const params = { comune: city };
     if (fuel) params.fuel = fuel;
@@ -22,14 +24,21 @@ export function useFuelStations(city, fuel) {
     axios
       .get(`${API}/fuel/stations`, { params })
       .then((res) => {
-        if (!cancelled) setStations(res.data);
+        const elapsed = Date.now() - startTime;
+        const delay = Math.max(0, MIN_LOADING_MS - elapsed);
+        setTimeout(() => {
+          if (!cancelled) {
+            setStations(res.data);
+            setLoading(false);
+          }
+        }, delay);
       })
       .catch((err) => {
         console.error("Failed to fetch stations:", err);
-        if (!cancelled) setStations([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setStations([]);
+          setLoading(false);
+        }
       });
 
     return () => { cancelled = true; };

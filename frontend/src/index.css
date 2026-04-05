@@ -92,16 +92,34 @@ a.touch-target {
 }
 
 .leaflet-control-attribution {
-  background: rgba(255,255,255,0.7) !important;
-  backdrop-filter: blur(8px);
-  font-size: 9px !important;
-  padding: 2px 6px !important;
-  border-radius: 6px 0 0 0 !important;
+  display: none !important;
 }
 
 /* Ad placeholder — hidden when real ad loads */
 .ad-container .adsbygoogle[data-ad-status="filled"] + .ad-placeholder {
   display: none;
+}
+
+/* Loading overlay */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.4) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes spinPulse {
+  0% { transform: rotate(0deg); opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { transform: rotate(360deg); opacity: 0.7; }
+}
+
+.spin-pulse {
+  animation: spinPulse 1s linear infinite;
 }
 
 /* Custom scrollbar */
